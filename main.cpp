@@ -10,6 +10,7 @@ static const StringPair TestData[] = {
     {"AAA", "A3"},
     {"ABC", "ABC"},
     {"AAAAAAAAAAAAA", "A13"},
+    {"ABBCDDDXYYY", "AB2CD3XY3"},
     {"AABBBCDDXY", "A2B3CD2XY"},
     {"AAAAAAAAAAAABBBCCCCCCCCCCCCCCCCCDDXY", "A12B3C17D2XY"},
 };
@@ -22,24 +23,19 @@ void EncodeCharRepetitionsInPlace(std::string & str) {
     size_t cur_count = 1;
     char cur_c = str[0];
 
-    size_t i = 1;
-    char ith_char = str[i];
-
-    for (; i < str.size(); ++i) {
-        ith_char = str[i];
+    for (size_t i = 1; i < str.size(); ++i) {
         if (str[i] != cur_c) {
-            if (cur_count == 1) {
-                str[i - shift] = str[i];
-                cur_c = str[i];
-            } else {
-                std::string num_str = std::to_string(cur_count);
+            if (cur_count != 1) {
                 shift += cur_count - 1;
+
+                std::string num_str = std::to_string(cur_count);
                 num_str.copy(&str[i - shift], num_str.size());
+
                 shift -= num_str.size();
-                str[i - shift] = str[i];
-                cur_c = str[i];
                 cur_count = 1;
             }
+            str[i - shift] = str[i];
+            cur_c = str[i];
 
         } else {
             ++cur_count;
@@ -48,9 +44,10 @@ void EncodeCharRepetitionsInPlace(std::string & str) {
 
     if (cur_count != 1) {
         shift += cur_count - 1;
-        std::string num_str = std::to_string(cur_count);
 
-        num_str.copy(&str[i - shift], num_str.size());
+        std::string num_str = std::to_string(cur_count);
+        num_str.copy(&str[str.size() - shift], num_str.size());
+
         shift -= num_str.size();
     }
     str.resize(str.size() - shift);
